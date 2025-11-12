@@ -1,0 +1,45 @@
+//MASTER CODE
+
+#include <Wire.h>  // I2C library
+
+void setup() {
+  Wire.begin();         // join I2C bus as Master
+  Serial.begin(9600);   // for debugging
+}
+
+void loop() {
+  Wire.beginTransmission(8); // transmit to device #8 (Slave address)
+  Wire.write("Y");           // send character ‘Y’
+  Wire.write("Hello");       // or string data
+  Wire.endTransmission();    // stop transmitting
+
+  Serial.println("Sent data to Slave");
+  delay(1000);
+}
+
+
+// SLAVE CODE
+#include <Wire.h>
+
+void setup() {
+  Wire.begin(8);                // join I2C bus with address #8
+  Wire.onReceive(receiveEvent); // register receive event
+  Serial.begin(9600);           // start serial monitor
+}
+
+void loop() {
+  delay(100); // wait for events
+}
+
+// function executes whenever data is received from master
+void receiveEvent(int howMany) {
+  Serial.print("Received: ");
+  while (Wire.available()) {    // loop through all bytes
+    char c = Wire.read();       // receive byte
+    Serial.print(c);
+  }
+  Serial.println();
+}
+//A4 TO A4
+// A5 TO A5
+//GND
