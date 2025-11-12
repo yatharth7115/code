@@ -1,0 +1,92 @@
+// mikroC PRO for PIC - 16x2 LCD example (PIC16F877A)
+// Displays "Yatharth EE51" at column 11 of row 1 and keeps shifting the display left.
+
+sbit rs at RC0_bit;   // Register Select
+sbit rw at RC1_bit;   // Read/Write
+sbit en at RC2_bit;   // Enable
+
+sbit rs_dir at TRISC0_bit;
+sbit rw_dir at TRISC1_bit;
+sbit en_dir at TRISC2_bit;
+
+unsigned int j;
+
+// Function prototypes
+void delay_custom(void);
+void lcd_init(void);
+void cmd(unsigned char a);
+void dat(unsigned char b);
+void show(const char *s);
+
+void main() {
+    // Configure ports
+    TRISB = 0x00;   // PORTB as output -> LCD data (D0..D7)
+    PORTB = 0x00;
+    
+    // Configure control pins as outputs
+    rs_dir = 0;
+    rw_dir = 0;
+    en_dir = 0;
+    rs = 0; rw = 0; en = 0;
+
+    lcd_init();             // Initialize LCD
+
+    // Place cursor at column 11 (0-based index 10) of row 1:
+    // DDRAM address for row1 start is 0x80, so column11 = 0x80 + 10 = 0x8A
+    cmd(0x8A);
+    show("Yatharth EE51");  // Display the string
+
+    // Main loop: shift display left repeatedly with a short delay
+    while(1) {
+        Delay_ms(250);      // built-in delay (mikroC)
+        cmd(0x18);         // Cursor/Display shift: shift display left
+        Delay_ms(250);
+    }
+}
+
+// Small custom delay (unused if you prefer Delay_ms)
+void delay_custom(void) {
+    for (j = 0; j < 1000; j++);
+}
+
+// Initialize LCD (8-bit mode, 2 lines, 5x8 font)
+void lcd_init(void) {
+    Delay_ms(20);          // Wait for LCD to power up
+    cmd(0x38);             // Function set: 8-bit, 2 line, 5x8 dots
+    Delay_ms(5);
+    cmd(0x0C);             // Display ON, Cursor OFF, Blink OFF
+    Delay_ms(2);
+    cmd(0x06);             // Entry mode: increment cursor, no shift
+    Delay_ms(2);
+    cmd(0x01);             // Clear display
+    Delay_ms(2);
+}
+
+// Send a command to LCD
+void cmd(unsigned char a) {
+    PORTB = a;    // Put command on data bus
+    rs = 0;       // Command mode
+    rw = 0;       // Write
+    en = 1;
+    Delay_ms(1);
+    en = 0;
+    Delay_ms(2);  // small pause for command to settle
+}
+
+// Send one data byte (character)
+void dat(unsigned char b) {
+    PORTB = b;    // Put data on data bus
+    rs = 1;       // Data mode
+    rw = 0;       // Write
+    en = 1;
+    Delay_ms(1);
+    en = 0;
+    Delay_ms(2);  // small pause
+}
+
+// Display a null-terminated string
+void show(const char *s) {
+    while (*s) {
+        dat(*s++);
+    }
+}
