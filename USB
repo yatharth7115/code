@@ -1,0 +1,17 @@
+// USB CDC Serial example for Leonardo / Micro
+void setup() {
+  Serial.begin(9600);           // USB Serial
+  while (!Serial) { /* wait for host */ } // optional: wait for USB connection
+  Serial.println("USB Serial ready");
+}
+
+void loop() {
+  if (Serial.available()) {
+    String s = Serial.readStringUntil('\n');
+    Serial.print("Echo: ");
+    Serial.println(s);
+  } else {
+    Serial.println("Hello from USB CDC");
+    delay(1000);
+  }
+}
