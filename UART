@@ -1,0 +1,24 @@
+
+//MASTER
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  Serial.println("Hello from Master!");
+  delay(1000);
+}
+//SLAVE
+String incomingData;
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  if (Serial.available()) {
+    incomingData = Serial.readString();
+    Serial.print("Received: ");
+    Serial.println(incomingData);
+  }
+}
