@@ -1,0 +1,34 @@
+void main() {
+    TRISB = 0x00;       // Set PORTB as output (connected to stepper driver)
+    PORTB = 0x00;       // Initialize all coils OFF
+
+    while(1) {
+        // Step sequence: Forward direction
+        PORTB = 0x01;   // Step 1 (coil A energized)
+        Delay_ms(250);
+
+        PORTB = 0x02;   // Step 2 (coil B energized)
+        Delay_ms(250);
+
+        PORTB = 0x04;   // Step 3 (coil C energized)
+        Delay_ms(250);
+
+        PORTB = 0x08;   // Step 4 (coil D energized)
+        Delay_ms(250);
+
+        Delay_ms(1000); // Pause for 1 second before reverse rotation
+
+        // Step sequence: Reverse direction
+        PORTB = 0x08;   // Step 4
+        Delay_ms(250);
+
+        PORTB = 0x04;   // Step 3
+        Delay_ms(250);
+
+        PORTB = 0x02;   // Step 2
+        Delay_ms(250);
+
+        PORTB = 0x01;   // Step 1
+        Delay_ms(250);
+    }
+}
