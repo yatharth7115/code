@@ -1,66 +1,43 @@
-/* 
-  Display keypad number on PORTA (binary)
-  Assumes mikroC Keypad library with Keypad_Init() and Keypad_Key_Press()
-  Keypad is wired to PORTB (rows/cols). PORTA outputs the numeric value 0..9.
-*/
+unsigned short kp=0;
 
-unsigned short kp;        // variable to hold key code
+char keypadPort at PORTB;
 
-void main() {
-    TRISA = 0x00;         // PORTA as output (to display number)
-    PORTA = 0x00;         // clear PORTA
+void main(){
 
-    // If using PORTB for keypad data direction, leave TRISB default
-    // or configure rows as inputs and cols as outputs in hardware library.
-    // Many mikroC keypad libraries handle TRIS internally, so we don't set TRISB here.
+    TRISA=0x00;
 
-    Keypad_Init();        // initialize keypad (assumes keypad on PORTB)
+    PORTA=0x00;
 
-    while (1) {
-        // wait for a key press (blocking); Keypad_Key_Press returns 0 if no key
-        do {
-            kp = Keypad_Key_Press();   // returns char code or 0
-        } while (!kp);
+    Keypad_Init();
 
-        // small debounce delay (optional, but safe)
-        Delay_ms(50);
+    while(1){
 
-        // If keypad returns ASCII digits '0'..'9'
-        if (kp >= '0' && kp <= '9') {
-            PORTA = (unsigned char)(kp - '0'); // write 0..9 to PORTA (binary)
-        }
-        else {
-            // handle non-numeric keys: change as you want
-            if (kp == '*') {
-                // example: display 10 on PORTA
-                PORTA = 10;
-            } 
-            else if (kp == '#') {
-                // example: clear display
-                PORTA = 0x00;
-            }
-            else if (kp == 'A') {
-                PORTA = 11;
-            }
-            else if (kp == 'B') {
-                PORTA = 12;
-            }
-            else if (kp == 'C') {
-                PORTA = 13;
-            }
-            else if (kp == 'D') {
-                PORTA = 14;
-            }
-            else {
-                // unknown key: do nothing
-            }
+        do{
+
+            kp=Keypad_Key_Press();
+
         }
 
-        // wait until key is released (avoid repeated reads while held)
-        do {
-            kp = Keypad_Key_Press();
-        } while (kp);
+        while(!kp);
 
-        Delay_ms(100); // small gap before next press accepted
+            if(kp<=3){
+
+                PORTA=kp;
+
+            }
+
+            else if(kp>3 && kp<=7){
+
+                PORTA=kp-1;
+
+            }
+
+            else if(kp>8 && kp<=11){
+
+                PORTA=kp-2;
+
+            }
+
     }
+
 }
